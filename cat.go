@@ -42,7 +42,7 @@ func main() {
 
 	if *lineNumberOpt {
 		for num, line := range textArray {
-			fmt.Printf("%4d  %s\n", num, line)
+			fmt.Printf("%4d  %s\n", num+1, line)
 		}
 	} else {
 		fmt.Print(string(text))
