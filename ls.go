@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	recursivelyOpt = flag.Bool("R", false, "Recursively list")
+	recursivelyOpt       = flag.Bool("R", false, "Recursively list")
+	nameBeginWithADotOpt = flag.Bool("a", false, "Display names begin with a dot")
 )
 
 func main() {
@@ -43,6 +44,10 @@ func isDir(path string) bool {
 	return Info.IsDir()
 }
 
+func isBeginADot(name string) bool {
+	return []rune(name)[0] == []rune(".")[0]
+}
+
 func outputFileList(path string) {
 	files, err := ioutil.ReadDir(path)
 
@@ -52,6 +57,9 @@ func outputFileList(path string) {
 	}
 
 	for _, file := range files {
+		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
+			continue
+		}
 		fmt.Printf("%s ", file.Name())
 	}
 	fmt.Print("\n\n")
@@ -61,6 +69,9 @@ func outputFileList(path string) {
 	}
 
 	for _, file := range files {
+		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
+			continue
+		}
 		newpath := path + "/" + file.Name()
 		if isDir(newpath) {
 			fmt.Println(newpath)
