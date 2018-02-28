@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	outputFileList(path, recursivelyOpt)
+	outputFileList(path)
 
 }
 
@@ -43,7 +43,7 @@ func isDir(path string) bool {
 	return Info.IsDir()
 }
 
-func outputFileList(path string, recursivelyOpt *bool) {
+func outputFileList(path string) {
 	files, err := ioutil.ReadDir(path)
 
 	if err != nil {
@@ -64,7 +64,7 @@ func outputFileList(path string, recursivelyOpt *bool) {
 		newpath := path + "/" + file.Name()
 		if isDir(newpath) {
 			fmt.Println(newpath)
-			outputFileList(newpath, recursivelyOpt)
+			outputFileList(newpath)
 		}
 	}
 }
