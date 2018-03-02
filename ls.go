@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 )
 
 var (
 	recursivelyOpt       = flag.Bool("R", false, "Recursively list")
 	nameBeginWithADotOpt = flag.Bool("a", false, "Display names begin with a dot")
+	longFormatOpt        = flag.Bool("l", false, "Long format")
 )
 
 func main() {
@@ -30,7 +32,11 @@ func main() {
 		return
 	}
 
-	outputFileList(path)
+	if *longFormatOpt {
+		outputLongFormat(path)
+	} else {
+		outputFileList(path)
+	}
 
 }
 
@@ -72,10 +78,30 @@ func outputFileList(path string) {
 		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
 			continue
 		}
-		newpath := path + "/" + file.Name()
+		//newpath := path + "/" + file.Name()
+		newpath := filepath.Join(path, file.Name())
 		if isDir(newpath) {
 			fmt.Println(newpath)
 			outputFileList(newpath)
 		}
 	}
+}
+
+func outputLongFormat(path string) {
+	files, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for _, file := range files {
+		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
+			continue
+		}
+
+		// TODO : get file owner, group
+		fmt.Printf("%s %8d %s %s\n", file.Mode(), file.Size(), file.ModTime(), file.Name())
+	}
+
 }
