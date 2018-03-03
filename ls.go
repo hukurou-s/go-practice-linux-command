@@ -12,6 +12,7 @@ var (
 	recursivelyOpt       = flag.Bool("R", false, "Recursively list")
 	nameBeginWithADotOpt = flag.Bool("a", false, "Display names begin with a dot")
 	longFormatOpt        = flag.Bool("l", false, "Long format")
+	sortOpt              = flag.Bool("S", false, "Sort by file size")
 )
 
 func main() {
@@ -54,12 +55,40 @@ func isBeginADot(name string) bool {
 	return []rune(name)[0] == []rune(".")[0]
 }
 
+func sortByFileSize(files []os.FileInfo) {
+	k := 1
+	n := len(files)
+
+	for k < n {
+		if files[k-1].Size() >= files[k].Size() {
+			k++
+		} else {
+			swap(files, k-1, k)
+			k--
+			if k == 0 {
+				k++
+			}
+		}
+
+	}
+}
+
+func swap(files []os.FileInfo, i int, j int) {
+	tmp := files[i]
+	files[i] = files[j]
+	files[j] = tmp
+}
+
 func outputFileList(path string) {
 	files, err := ioutil.ReadDir(path)
 
 	if err != nil {
 		fmt.Println(err)
 		return
+	}
+
+	if *sortOpt {
+		sortByFileSize(files)
 	}
 
 	for _, file := range files {
