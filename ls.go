@@ -13,6 +13,7 @@ var (
 	nameBeginWithADotOpt = flag.Bool("a", false, "Display names begin with a dot")
 	longFormatOpt        = flag.Bool("l", false, "Long format")
 	sortOpt              = flag.Bool("S", false, "Sort by file size")
+	reverseArrayOpt      = flag.Bool("r", false, "Reverse list")
 )
 
 func main() {
@@ -73,6 +74,15 @@ func sortByFileSize(files []os.FileInfo) {
 	}
 }
 
+func reverseArray(files []os.FileInfo) {
+	n := len(files)
+	k := 0
+	for k < n/2 {
+		swap(files, k, n-k-1)
+		k++
+	}
+}
+
 func swap(files []os.FileInfo, i int, j int) {
 	tmp := files[i]
 	files[i] = files[j]
@@ -89,6 +99,9 @@ func outputFileList(path string) {
 
 	if *sortOpt {
 		sortByFileSize(files)
+	}
+	if *reverseArrayOpt {
+		reverseArray(files)
 	}
 
 	for _, file := range files {
@@ -122,6 +135,14 @@ func outputLongFormat(path string) {
 	if err != nil {
 		fmt.Println(err)
 		return
+	}
+
+	if *sortOpt {
+		sortByFileSize(files)
+	}
+
+	if *reverseArrayOpt {
+		reverseArray(files)
 	}
 
 	for _, file := range files {
