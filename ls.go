@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 var (
@@ -57,21 +58,10 @@ func isBeginADot(name string) bool {
 }
 
 func sortByFileSize(files []os.FileInfo) {
-	k := 1
-	n := len(files)
 
-	for k < n {
-		if files[k-1].Size() >= files[k].Size() {
-			k++
-		} else {
-			swap(files, k-1, k)
-			k--
-			if k == 0 {
-				k++
-			}
-		}
-
-	}
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].Size() >= files[j].Size()
+	})
 }
 
 func reverseArray(files []os.FileInfo) {
