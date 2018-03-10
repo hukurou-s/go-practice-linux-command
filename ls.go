@@ -65,18 +65,9 @@ func sortByFileSize(files []os.FileInfo) {
 }
 
 func reverseArray(files []os.FileInfo) {
-	n := len(files)
-	k := 0
-	for k < n/2 {
-		swap(files, k, n-k-1)
-		k++
+	for i, j := 0, len(files)-1; i < j; i, j = i+1, j-1 {
+		files[i], files[j] = files[j], files[i]
 	}
-}
-
-func swap(files []os.FileInfo, i int, j int) {
-	tmp := files[i]
-	files[i] = files[j]
-	files[j] = tmp
 }
 
 func outputFileList(path string) {
