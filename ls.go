@@ -71,19 +71,8 @@ func reverseArray(files []os.FileInfo) {
 }
 
 func outputFileList(path string) {
-	files, err := ioutil.ReadDir(path)
 
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	if *sortOpt {
-		sortByFileSize(files)
-	}
-	if *reverseArrayOpt {
-		reverseArray(files)
-	}
+	files := readDirectory(path)
 
 	for _, file := range files {
 		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
@@ -111,20 +100,8 @@ func outputFileList(path string) {
 }
 
 func outputLongFormat(path string) {
-	files, err := ioutil.ReadDir(path)
 
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	if *sortOpt {
-		sortByFileSize(files)
-	}
-
-	if *reverseArrayOpt {
-		reverseArray(files)
-	}
+	files := readDirectory(path)
 
 	for _, file := range files {
 		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
@@ -135,4 +112,23 @@ func outputLongFormat(path string) {
 		fmt.Printf("%s %8d %s %s\n", file.Mode(), file.Size(), file.ModTime(), file.Name())
 	}
 
+}
+
+func readDirectory(path string) []os.FileInfo {
+	files, err := ioutil.ReadDir(path)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	if *sortOpt {
+		sortByFileSize(files)
+	}
+
+	if *reverseArrayOpt {
+		reverseArray(files)
+	}
+
+	return files
 }
