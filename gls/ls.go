@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/hukurou-s/go-command/arguments"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,16 +11,25 @@ import (
 )
 
 var (
-	recursivelyOpt       = flag.Bool("R", false, "Recursively list")
-	nameBeginWithADotOpt = flag.Bool("a", false, "Display names begin with a dot")
-	longFormatOpt        = flag.Bool("l", false, "Long format")
-	sortOpt              = flag.Bool("S", false, "Sort by file size")
-	reverseArrayOpt      = flag.Bool("r", false, "Reverse list")
+	R *bool
+	a *bool
+	l *bool
+	S *bool
+	r *bool
 )
+
+func init() {
+	R = flag.Bool("R", false, "Recursively list")
+	a = flag.Bool("a", false, "Display names begin with a dot")
+	l = flag.Bool("l", false, "Long format")
+	S = flag.Bool("S", false, "Sort by file size")
+	r = flag.Bool("r", false, "Reverse list")
+}
 
 func main() {
 
 	flag.Parse()
+	Opts := arguments.FetFlags(R, a, l, S, r)
 
 	path := "./"
 	if flag.Arg(0) != "" {
@@ -33,9 +43,10 @@ func main() {
 	if !isDir(path) {
 		fmt.Println(path)
 		return
+
 	}
 
-	if *longFormatOpt {
+	if Opts.longFormatOpt {
 		outputLongFormat(path)
 	} else {
 		outputFileList(path)
@@ -75,22 +86,21 @@ func outputFileList(path string) {
 	files := readDirectory(path)
 
 	for _, file := range files {
-		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.nameBeginWithADotOpt && isBeginADot(file.Name()) {
 			continue
 		}
 		fmt.Printf("%s ", file.Name())
 	}
 	fmt.Print("\n\n")
 
-	if !*recursivelyOpt {
+	if !Opts.recursivelyOpt {
 		return
 	}
 
 	for _, file := range files {
-		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.nameBeginWithADotOpt && isBeginADot(file.Name()) {
 			continue
 		}
-		//newpath := path + "/" + file.Name()
 		newpath := filepath.Join(path, file.Name())
 		if isDir(newpath) {
 			fmt.Println(newpath)
@@ -104,8 +114,9 @@ func outputLongFormat(path string) {
 	files := readDirectory(path)
 
 	for _, file := range files {
-		if !*nameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.nameBeginWithADotOpt && isBeginADot(file.Name()) {
 			continue
+
 		}
 
 		// TODO : get file owner, group
@@ -122,11 +133,11 @@ func readDirectory(path string) []os.FileInfo {
 		os.Exit(1)
 	}
 
-	if *sortOpt {
+	if Opts.sortOpt {
 		sortByFileSize(files)
 	}
 
-	if *reverseArrayOpt {
+	if Opts.reverseArrayOpt {
 		reverseArray(files)
 	}
 
