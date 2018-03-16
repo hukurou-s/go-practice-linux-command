@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/hukurou-s/go-command/arguments"
+	"github.com/hukurou-s/go-command/gls/arguments"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,11 +11,12 @@ import (
 )
 
 var (
-	R *bool
-	a *bool
-	l *bool
-	S *bool
-	r *bool
+	R    *bool
+	a    *bool
+	l    *bool
+	S    *bool
+	r    *bool
+	Opts *arguments.CommandOpts
 )
 
 func init() {
@@ -24,12 +25,12 @@ func init() {
 	l = flag.Bool("l", false, "Long format")
 	S = flag.Bool("S", false, "Sort by file size")
 	r = flag.Bool("r", false, "Reverse list")
+	flag.Parse()
+	Opts = arguments.GetFlags(R, a, l, S, r)
+
 }
 
 func main() {
-
-	flag.Parse()
-	Opts := arguments.FetFlags(R, a, l, S, r)
 
 	path := "./"
 	if flag.Arg(0) != "" {
@@ -46,7 +47,7 @@ func main() {
 
 	}
 
-	if Opts.longFormatOpt {
+	if Opts.LongFormatOpt {
 		outputLongFormat(path)
 	} else {
 		outputFileList(path)
@@ -86,19 +87,19 @@ func outputFileList(path string) {
 	files := readDirectory(path)
 
 	for _, file := range files {
-		if !Opts.nameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.NameBeginWithADotOpt && isBeginADot(file.Name()) {
 			continue
 		}
 		fmt.Printf("%s ", file.Name())
 	}
 	fmt.Print("\n\n")
 
-	if !Opts.recursivelyOpt {
+	if !Opts.RecursivelyOpt {
 		return
 	}
 
 	for _, file := range files {
-		if !Opts.nameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.NameBeginWithADotOpt && isBeginADot(file.Name()) {
 			continue
 		}
 		newpath := filepath.Join(path, file.Name())
@@ -114,7 +115,7 @@ func outputLongFormat(path string) {
 	files := readDirectory(path)
 
 	for _, file := range files {
-		if !Opts.nameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.NameBeginWithADotOpt && isBeginADot(file.Name()) {
 			continue
 
 		}
@@ -133,11 +134,11 @@ func readDirectory(path string) []os.FileInfo {
 		os.Exit(1)
 	}
 
-	if Opts.sortOpt {
+	if Opts.SortOpt {
 		sortByFileSize(files)
 	}
 
-	if Opts.reverseArrayOpt {
+	if Opts.ReverseArrayOpt {
 		reverseArray(files)
 	}
 
