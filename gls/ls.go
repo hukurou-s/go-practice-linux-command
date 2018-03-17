@@ -47,7 +47,7 @@ func main() {
 
 	}
 
-	if Opts.LongFormatOpt {
+	if Opts.LongFormatOpt() {
 		outputLongFormat(path)
 	} else {
 		outputFileList(path)
@@ -87,19 +87,19 @@ func outputFileList(path string) {
 	files := readDirectory(path)
 
 	for _, file := range files {
-		if !Opts.NameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
 			continue
 		}
 		fmt.Printf("%s ", file.Name())
 	}
 	fmt.Print("\n\n")
 
-	if !Opts.RecursivelyOpt {
+	if !Opts.RecursivelyOpt() {
 		return
 	}
 
 	for _, file := range files {
-		if !Opts.NameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
 			continue
 		}
 		newpath := filepath.Join(path, file.Name())
@@ -115,9 +115,8 @@ func outputLongFormat(path string) {
 	files := readDirectory(path)
 
 	for _, file := range files {
-		if !Opts.NameBeginWithADotOpt && isBeginADot(file.Name()) {
+		if !Opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
 			continue
-
 		}
 
 		// TODO : get file owner, group
@@ -134,11 +133,11 @@ func readDirectory(path string) []os.FileInfo {
 		os.Exit(1)
 	}
 
-	if Opts.SortOpt {
+	if Opts.SortOpt() {
 		sortByFileSize(files)
 	}
 
-	if Opts.ReverseArrayOpt {
+	if Opts.ReverseArrayOpt() {
 		reverseArray(files)
 	}
 
