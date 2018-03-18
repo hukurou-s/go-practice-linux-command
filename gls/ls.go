@@ -11,12 +11,11 @@ import (
 )
 
 var (
-	R    *bool
-	a    *bool
-	l    *bool
-	S    *bool
-	r    *bool
-	Opts *arguments.CommandOpts
+	R *bool
+	a *bool
+	l *bool
+	S *bool
+	r *bool
 )
 
 func init() {
@@ -25,12 +24,11 @@ func init() {
 	l = flag.Bool("l", false, "Long format")
 	S = flag.Bool("S", false, "Sort by file size")
 	r = flag.Bool("r", false, "Reverse list")
-	flag.Parse()
-	Opts = arguments.GetFlags(R, a, l, S, r)
-
 }
 
 func main() {
+	flag.Parse()
+	options := arguments.GetFlags(R, a, l, S, r)
 
 	path := "./"
 	if flag.Arg(0) != "" {
@@ -44,13 +42,12 @@ func main() {
 	if !isDir(path) {
 		fmt.Println(path)
 		return
-
 	}
 
-	if Opts.LongFormatOpt() {
-		outputLongFormat(path)
+	if options.LongFormatOpt() {
+		outputLongFormat(path, options)
 	} else {
-		outputFileList(path)
+		outputFileList(path, options)
 	}
 
 }
@@ -82,40 +79,40 @@ func reverseArray(files []os.FileInfo) {
 	}
 }
 
-func outputFileList(path string) {
+func outputFileList(path string, opts *arguments.CommandOpts) {
 
-	files := readDirectory(path)
+	files := readDirectory(path, opts)
 
 	for _, file := range files {
-		if !Opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
+		if !opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
 			continue
 		}
 		fmt.Printf("%s ", file.Name())
 	}
 	fmt.Print("\n\n")
 
-	if !Opts.RecursivelyOpt() {
+	if !opts.RecursivelyOpt() {
 		return
 	}
 
 	for _, file := range files {
-		if !Opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
+		if !opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
 			continue
 		}
 		newpath := filepath.Join(path, file.Name())
 		if isDir(newpath) {
 			fmt.Println(newpath)
-			outputFileList(newpath)
+			outputFileList(newpath, opts)
 		}
 	}
 }
 
-func outputLongFormat(path string) {
+func outputLongFormat(path string, opts *arguments.CommandOpts) {
 
-	files := readDirectory(path)
+	files := readDirectory(path, opts)
 
 	for _, file := range files {
-		if !Opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
+		if !opts.NameBeginWithADotOpt() && isBeginADot(file.Name()) {
 			continue
 		}
 
@@ -125,7 +122,7 @@ func outputLongFormat(path string) {
 
 }
 
-func readDirectory(path string) []os.FileInfo {
+func readDirectory(path string, opts *arguments.CommandOpts) []os.FileInfo {
 	files, err := ioutil.ReadDir(path)
 
 	if err != nil {
@@ -133,11 +130,11 @@ func readDirectory(path string) []os.FileInfo {
 		os.Exit(1)
 	}
 
-	if Opts.SortOpt() {
+	if opts.SortOpt() {
 		sortByFileSize(files)
 	}
 
-	if Opts.ReverseArrayOpt() {
+	if opts.ReverseArrayOpt() {
 		reverseArray(files)
 	}
 
