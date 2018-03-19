@@ -30,10 +30,7 @@ func main() {
 	flag.Parse()
 	options := arguments.GetFlags(R, a, l, S, r)
 
-	path := "./"
-	if flag.Arg(0) != "" {
-		path = flag.Arg(0)
-	}
+	path := getPath()
 
 	if !isExist(path) {
 		fmt.Println("No such file or directory")
@@ -50,6 +47,14 @@ func main() {
 		outputFileList(path, options)
 	}
 
+}
+
+func getPath() string {
+	if flag.Arg(0) != "" {
+		return flag.Arg(0)
+	}
+
+	return "./"
 }
 
 func isExist(path string) bool {
